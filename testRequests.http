@@ -2,12 +2,12 @@ POST http://localhost:7071/api/CreatePhrase
 Content-Type: application/json
 
 {
-  "projectId": "07e84005-3963-49cf-a7cb-e055d08f796c",
-  "name": "New Phrase"
+  "projectId": "19d0db40-a7e1-45ff-90e5-dbb18e9613ce",
+  "name": "New Phrase 2"
 }
 
 ###
-GET http://localhost:7071/api/GetProject/07e84005-3963-49cf-a7cb-e055d08f796c
+GET http://localhost:7071/api/GetProject/19d0db40-a7e1-45ff-90e5-dbb18e9613ce
 Accept: application/json
 
 ###

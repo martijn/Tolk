@@ -33,6 +33,8 @@ public class Project : AggregateBase, IAggregate
                 throw new NotImplementedException();
         };
 
+        Version += 1;
+        
         if (!_isReplaying)
         {
             @event.Version = Version;
@@ -40,8 +42,6 @@ public class Project : AggregateBase, IAggregate
             _unsavedEvents.Add(@event);
             
         }
-
-        Version += 1;
     }
 
     public static Project Create(IEvent initialEvent)
@@ -85,11 +85,11 @@ public class Project : AggregateBase, IAggregate
 
     public void CreatePhrase(string name)
     {
-        ApplyEvent(new PhraseCreatedEvent(new Guid(), name));
+        ApplyEvent(new PhraseCreatedEvent(Guid.NewGuid(), name));
     }
 
     public void UpdateTranslation(string phraseKey, string locale, string value)
     {
-        ApplyEvent(new TranslationUpdatedEvent(new Guid(), phraseKey, locale, value));
+        ApplyEvent(new TranslationUpdatedEvent(Guid.NewGuid(), phraseKey, locale, value));
     }
 }

@@ -7,11 +7,11 @@ public class AggregateTest
     {
         var events = new List<IEvent>()
         {
-            new ProjectCreatedEvent(new Guid(), "My test project"),
-            new SomePropertyChangedEvent(new Guid(), "A value")
+            new ProjectCreatedEvent(Guid.NewGuid(), "My test project"),
+            new SomePropertyChangedEvent(Guid.NewGuid(), "A value")
         };
         
-        var project = new Project(new Guid(), events);
+        var project = new Project(Guid.NewGuid(), events);
         
         Assert.Equal("My test project", project.Name);
         Assert.Equal("A value", project.SomeProperty);
@@ -20,7 +20,7 @@ public class AggregateTest
     [Fact]
     public void ChangeSomePropertyTest()
     {
-        var initialEvent = new ProjectCreatedEvent(new Guid(), "My test project");
+        var initialEvent = new ProjectCreatedEvent(Guid.NewGuid(), "My test project");
 
         var project = Project.Create(initialEvent);
         
@@ -33,7 +33,7 @@ public class AggregateTest
     [Fact]
     public void CreateSetsIdAndPartitionKeyTest()
     {
-        var initialEvent = new ProjectCreatedEvent(new Guid(), "My test project");
+        var initialEvent = new ProjectCreatedEvent(Guid.NewGuid(), "My test project");
         var project = Project.Create(initialEvent);
         
         Assert.NotEqual(Guid.Empty, project.Id);
@@ -43,7 +43,7 @@ public class AggregateTest
     [Fact]
     public void VersionIncrementTest()
     {
-        var initialEvent = new ProjectCreatedEvent(new Guid(), "My test project");
+        var initialEvent = new ProjectCreatedEvent(Guid.NewGuid(), "My test project");
         var project = Project.Create(initialEvent);
         
         Assert.Equal(1, project.Version);

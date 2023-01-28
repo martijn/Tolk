@@ -14,7 +14,7 @@ public abstract class AggregateBase
     public string PartitionKey { get; }
     // TODO Unsaved events
 
-    public int Version { get; protected set; } = 0;
+    public int Version { get; protected set; } = -1;
    
     protected bool _isReplaying;
     protected List<IEvent> _unsavedEvents = new List<IEvent>();

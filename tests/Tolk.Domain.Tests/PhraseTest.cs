@@ -24,7 +24,7 @@ public class PhraseTest
         var key = "A new phrase";
         var translation = "Een nieuwe tekst";
         
-        var initialEvent = new ProjectCreatedEvent(new Guid(), "My test project");
+        var initialEvent = new ProjectCreatedEvent(Guid.NewGuid(), "My test project");
         var project = Project.Create(initialEvent);
         
         project.CreatePhrase(key);
@@ -47,7 +47,7 @@ public class PhraseTest
     [Fact]
     public void UpdateTranslationForNonexistentPhrase()
     {
-        var initialEvent = new ProjectCreatedEvent(new Guid(), "My test project");
+        var initialEvent = new ProjectCreatedEvent(Guid.NewGuid(), "My test project");
         var project = Project.Create(initialEvent);
         
         Assert.Throws<InvariantException>(() => project.UpdateTranslation("key", "en", "value"));

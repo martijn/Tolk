@@ -23,7 +23,7 @@ public static class Example
         var nlTranslation = "Een nieuwe tekst";
         
         var initialEvent = new ProjectCreatedEvent(
-            new Guid(),
+            Guid.NewGuid(),
             "My test project");
         
         var project = Project.Create(initialEvent);
