@@ -16,6 +16,7 @@ public static class ProjectBuilder
             var eventType = Type.GetType($"Tolk.Domain.ProjectAggregate.Events.{eventTypeString}, Tolk.Domain");
 
             if (eventType is null) throw new Exception($"Can't locate eventType {eventTypeString}");
+            // TODO safe cast to IEvent
             events.Add((IEvent)jsonEvent.Deserialize(eventType)!);
         }
 

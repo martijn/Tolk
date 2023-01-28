@@ -8,7 +8,8 @@ namespace Tolk.FunctionApp;
 
 public static class GetProject
 {
-    private const string Query = "SELECT * FROM ProjectEvents e WHERE e.Aggregate = CONCAT('Project-', {id}) ORDER BY e.Version DESC";
+    // TODO id -> projectId, DRY
+    private const string Query = "SELECT * FROM ProjectEvents e WHERE e.Aggregate = CONCAT('Project-', {id}) ORDER BY e.Version ASC";
 
     [Function("GetProject")]
     public static async Task<HttpResponseData> Run(

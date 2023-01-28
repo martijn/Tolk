@@ -1,49 +1,47 @@
-using System.Collections.Generic;
 using System.Net;
 using System.Text.Json;
-using Azure;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Tolk.Domain;
-using Tolk.Domain.ProjectAggregate;
-using Tolk.Domain.ProjectAggregate.Events;
 
 namespace Tolk.FunctionApp;
 
-public static class CreateProject
+public static class CreatePhrase
 {
-    [Function("CreateProject")]
+    private const string Query = "SELECT * FROM ProjectEvents e WHERE e.Aggregate = CONCAT('Project-', {projectId}) ORDER BY e.Version DESC";
+    
+    [Function("CreatePhrase")]
     public static async Task<SingleDocumentOutput> Run(
         [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req,
-        string? name,
+        Guid projectId,
+        string name,
+        [CosmosDBInput(
+            "TolkDev",
+            "ProjectEvents",
+            Connection = "AzureCosmosDbConnectionString",
+            SqlQuery = Query)]
+        List<JsonElement> jsonEvents,
         FunctionContext executionContext)
     {
-        if (name is null)
+        if (!jsonEvents.Any())
         {
-            var badRequestResponse = req.CreateResponse(HttpStatusCode.BadRequest);
-            await badRequestResponse.WriteAsJsonAsync(new { Error = "Please specify name" });
-            return new SingleDocumentOutput() { HttpResponse = badRequestResponse };
+            return new SingleDocumentOutput()
+            {
+                HttpResponse = req.CreateResponse(HttpStatusCode.NotFound)
+            };
         }
         
-        var initialEvent = new ProjectCreatedEvent(
-            Guid.NewGuid(),
-            name);
+        var project = ProjectBuilder.FromJsonEvents(projectId, jsonEvents);
+        project.CreatePhrase(name);
         
-        var project = Project.Create(initialEvent);
-        
-        // TODO naming
-        var response = req.CreateResponse(HttpStatusCode.OK);
-        await response.WriteAsJsonAsync(project);
-
         return new SingleDocumentOutput()
         {
             OutputEvent = project.UnsavedEvents().First() as Event,
-            HttpResponse = response
+            HttpResponse = req.CreateResponse(HttpStatusCode.OK)
         };
     }
-
-    // TODO DRY
+    
     public class SingleDocumentOutput
     {
         [CosmosDBOutput(
