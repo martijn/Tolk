@@ -49,6 +49,6 @@ public static class CreateProject
             "ProjectEvents",
             Connection = "AzureCosmosDbConnectionString")]
         public Event? OutputEvent { get; set; }
-        public HttpResponseData HttpResponse { get; set; }
+        public HttpResponseData? HttpResponse { get; set; }
     }
 }
