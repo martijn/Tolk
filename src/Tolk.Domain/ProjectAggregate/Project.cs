@@ -39,7 +39,7 @@ public class Project : AggregateBase, IAggregate
         {
             @event.Version = Version;
             @event.Aggregate = $"{GetType().Name}-{Id}";
-            _unsavedEvents.Add(@event);
+            _unsavedEvents.Add((@event as Event)!); // todo fix hack
             
         }
     }

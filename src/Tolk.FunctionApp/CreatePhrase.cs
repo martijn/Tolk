@@ -1,10 +1,8 @@
+using System.Collections.Immutable;
 using System.Net;
 using System.Text.Json;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
-using Microsoft.Extensions.Logging;
-using Tolk.Domain;
-
 namespace Tolk.FunctionApp;
 
 public static class CreatePhrase
@@ -34,10 +32,11 @@ public static class CreatePhrase
         
         var project = ProjectBuilder.FromJsonEvents(projectId, jsonEvents);
         project.CreatePhrase(name);
-        
+
         return new SingleDocumentOutput()
         {
-            OutputEvent = project.UnsavedEvents().First() as Event,
+            // Cast to object to allow polymorphic serialization of derived Events
+            OutputEvents = project.UnsavedEvents().ToImmutableList<object>(),
             HttpResponse = req.CreateResponse(HttpStatusCode.OK)
         };
     }
@@ -48,7 +47,8 @@ public static class CreatePhrase
             "TolkDev",
             "ProjectEvents",
             Connection = "AzureCosmosDbConnectionString")]
-        public Event? OutputEvent { get; set; }
+
+        public IReadOnlyList<object>? OutputEvents { get; set; }
         public HttpResponseData? HttpResponse { get; set; }
     }
 }

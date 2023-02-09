@@ -17,7 +17,7 @@ public abstract class AggregateBase
     public int Version { get; protected set; } = -1;
    
     protected bool _isReplaying;
-    protected List<IEvent> _unsavedEvents = new List<IEvent>();
+    protected List<Event> _unsavedEvents = new List<Event>();
 
     private void Replay(IEnumerable<IEvent> events)
     {
@@ -26,7 +26,7 @@ public abstract class AggregateBase
         _isReplaying = false;
     }
 
-    public List<IEvent> UnsavedEvents()
+    public List<Event> UnsavedEvents()
     {
         // todo clear
         return _unsavedEvents;
