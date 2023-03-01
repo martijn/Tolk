@@ -13,7 +13,7 @@ public class Project : AggregateBase, IAggregate
 
     public IEnumerable<Phrase> Phrases { get; private set; } = Enumerable.Empty<Phrase>();
 
-    public override void ApplyEvent(IEvent @event)
+    protected override void ApplyEvent(IEvent @event)
     {
         switch (@event)
         {
@@ -31,24 +31,29 @@ public class Project : AggregateBase, IAggregate
                 break;
             default:
                 throw new NotImplementedException();
-        };
-
-        Version += 1;
-        
-        if (!_isReplaying)
-        {
-            @event.Version = Version;
-            @event.Aggregate = $"{GetType().Name}-{Id}";
-            _unsavedEvents.Add((@event as Event)!); // todo fix hack
-            
         }
     }
 
     public static Project Create(IEvent initialEvent)
     {
         var project = new Project(Guid.NewGuid(), Enumerable.Empty<IEvent>());
-        project.ApplyEvent(initialEvent);
+        project.ApplyAndStoreEvent(initialEvent);
         return project;
+    }
+    
+    public void ChangeSomeProperty(string newValue)
+    {
+        ApplyAndStoreEvent(new SomePropertyChangedEvent(new Guid(), newValue));
+    }
+
+    public void CreatePhrase(string name)
+    {
+        ApplyAndStoreEvent(new PhraseCreatedEvent(Guid.NewGuid(), name));
+    }
+
+    public void UpdateTranslation(string phraseKey, string locale, string value)
+    {
+        ApplyAndStoreEvent(new TranslationUpdatedEvent(Guid.NewGuid(), phraseKey, locale, value));
     }
 
     private void Apply(ProjectCreatedEvent projectCreatedEvent)
@@ -66,7 +71,7 @@ public class Project : AggregateBase, IAggregate
         Phrases = Phrases.Union(new List<Phrase> { Phrase.Create(phraseCreatedEvent.Name) });
     }
 
-    public void Apply(TranslationUpdatedEvent @event)
+    private void Apply(TranslationUpdatedEvent @event)
     {
         var oldPhrase = Phrases.FirstOrDefault(p => p.Key == @event.PhraseKey);
         if (oldPhrase is null)
@@ -76,20 +81,5 @@ public class Project : AggregateBase, IAggregate
         var newPhrase = oldPhrase.With(translation);
 
         Phrases = Phrases.Except(new List<Phrase> { oldPhrase }).Union(new List<Phrase> { newPhrase });
-    }
-
-    public void ChangeSomeProperty(string newValue)
-    {
-        ApplyEvent(new SomePropertyChangedEvent(new Guid(), newValue));
-    }
-
-    public void CreatePhrase(string name)
-    {
-        ApplyEvent(new PhraseCreatedEvent(Guid.NewGuid(), name));
-    }
-
-    public void UpdateTranslation(string phraseKey, string locale, string value)
-    {
-        ApplyEvent(new TranslationUpdatedEvent(Guid.NewGuid(), phraseKey, locale, value));
     }
 }

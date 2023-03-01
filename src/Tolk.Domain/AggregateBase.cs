@@ -2,6 +2,8 @@ namespace Tolk.Domain;
 
 public abstract class AggregateBase
 {
+    private readonly List<Event> _unsavedEvents = new();
+
     protected AggregateBase(Guid id, IEnumerable<IEvent> events)
     {
         Id = id;
@@ -12,18 +14,16 @@ public abstract class AggregateBase
     public Guid Id { get; }
 
     public string PartitionKey { get; }
-    // TODO Unsaved events
 
-    public int Version { get; protected set; } = -1;
-   
-    protected bool _isReplaying;
-    protected List<Event> _unsavedEvents = new List<Event>();
+    public int Version { get; private set; } = -1;
 
     private void Replay(IEnumerable<IEvent> events)
     {
-        _isReplaying = true;
-        foreach (var @event in events) ApplyEvent(@event);
-        _isReplaying = false;
+        foreach (var @event in events)
+        {
+            ApplyEvent(@event);
+            Version += 1;
+        }
     }
 
     public List<Event> UnsavedEvents()
@@ -32,5 +32,19 @@ public abstract class AggregateBase
         return _unsavedEvents;
     }
 
-    public abstract void ApplyEvent(IEvent @event);
+    protected abstract void ApplyEvent(IEvent @event);
+
+    private void StoreEvent(IEvent @event)
+    {
+        @event.Version = Version;
+        @event.Aggregate = $"{GetType().Name}-{Id}";
+        _unsavedEvents.Add((@event as Event)!); // todo fix hack
+    }
+
+    protected void ApplyAndStoreEvent(IEvent @event)
+    {
+        ApplyEvent(@event);
+        Version += 1;
+        StoreEvent(@event);
+    }
 }

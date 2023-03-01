@@ -24,29 +24,23 @@ public class ProjectTest
     }
 
     [Fact]
-    public void ProjectHasUnsavedEventsWithVersions()
+    public void Project_WithUnsavedEvents_HasEventVersions()
     {
         Assert.Collection(_project.UnsavedEvents(),
-            e =>
-            {
-                Assert.IsType<ProjectCreatedEvent>(e);
-                Assert.Equal(0, e.Version);
-            },
-            e =>
-            {
-                Assert.IsType<PhraseCreatedEvent>(e);
-                Assert.Equal(1, e.Version);
-            },
-            e =>
-            {
-                Assert.IsType<TranslationUpdatedEvent>(e);
-                Assert.Equal(2, e.Version);
-            },
-            e =>
-            {
-                Assert.IsType<TranslationUpdatedEvent>(e);
-                Assert.Equal(3, e.Version);
-            });
+            e => Assert.Equal(0, e.Version),
+            e => Assert.Equal(1, e.Version),
+            e => Assert.Equal(2, e.Version),
+            e => Assert.Equal(3, e.Version));
+    }
+
+    [Fact]
+    public void Project_WithUnsavedEvents_HasEventTypes()
+    {
+        Assert.Collection(_project.UnsavedEvents(),
+            e => Assert.IsType<ProjectCreatedEvent>(e),
+            e => Assert.IsType<PhraseCreatedEvent>(e),
+            e => Assert.IsType<TranslationUpdatedEvent>(e),
+            e => Assert.IsType<TranslationUpdatedEvent>(e));
     }
 
     [Fact]
