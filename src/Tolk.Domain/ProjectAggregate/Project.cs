@@ -2,7 +2,7 @@ using Tolk.Domain.ProjectAggregate.Events;
 
 namespace Tolk.Domain.ProjectAggregate;
 
-public class Project : AggregateBase, IAggregate
+public class Project : Aggregate
 {
     public Project(Guid id, IEnumerable<IEvent> events) : base(id, events)
     {

@@ -1,10 +1,10 @@
 namespace Tolk.Domain;
 
-public abstract class AggregateBase
+public abstract class Aggregate
 {
     private readonly List<Event> _unsavedEvents = new();
 
-    protected AggregateBase(Guid id, IEnumerable<IEvent> events)
+    protected Aggregate(Guid id, IEnumerable<IEvent> events)
     {
         Id = id;
         PartitionKey = $"{GetType().Name}-{Id}";
