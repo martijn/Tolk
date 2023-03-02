@@ -4,9 +4,9 @@ using Tolk.Domain.ProjectAggregate;
 
 namespace Tolk.FunctionApp;
 
-public static class ProjectBuilder
+internal sealed class ProjectBuilder : IProjectBuilder
 {
-    public static Project FromJsonEvents(Guid id, IEnumerable<JsonElement> jsonEvents)
+    public Project FromJsonEvents(Guid id, IEnumerable<JsonElement> jsonEvents)
     {
         var events = new List<IEvent>();
 
