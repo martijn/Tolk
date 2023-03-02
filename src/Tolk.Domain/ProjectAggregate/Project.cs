@@ -40,7 +40,7 @@ public class Project : Aggregate
         project.ApplyAndStoreEvent(initialEvent);
         return project;
     }
-    
+
     public void ChangeSomeProperty(string newValue)
     {
         ApplyAndStoreEvent(new SomePropertyChangedEvent(new Guid(), newValue));

@@ -13,7 +13,7 @@ public class Translation : ValueObject
 
     public static Translation Create(string locale, string value)
     {
-        return new(locale, value);
+        return new Translation(locale, value);
     }
 
     protected override IEnumerable<object> GetEqualityComponents()
