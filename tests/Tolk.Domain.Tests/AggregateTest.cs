@@ -8,26 +8,26 @@ public class AggregateTest
         var events = new List<IEvent>
         {
             new ProjectCreatedEvent(Guid.NewGuid(), "My test project"),
-            new SomePropertyChangedEvent(Guid.NewGuid(), "A value")
+            new PhraseCreatedEvent(Guid.NewGuid(), "A phrase")
         };
 
         var project = new Project(Guid.NewGuid(), events);
 
         Assert.Equal("My test project", project.Name);
-        Assert.Equal("A value", project.SomeProperty);
+        Assert.Equal(1, project.Version);
     }
 
     [Fact]
-    public void ChangeSomePropertyTest()
+    public void CreatePhraseTest()
     {
         var initialEvent = new ProjectCreatedEvent(Guid.NewGuid(), "My test project");
 
         var project = Project.Create(initialEvent);
 
-        project.ChangeSomeProperty("A value");
+        project.CreatePhrase("A phrase");
 
         Assert.Equal("My test project", project.Name);
-        Assert.Equal("A value", project.SomeProperty);
+        Assert.Equal("A phrase", project.Phrases.First().Key);
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public class AggregateTest
 
         Assert.Equal(0, project.Version);
 
-        project.ChangeSomeProperty("A value");
+        project.CreatePhrase("A phrase");
 
         Assert.Equal(1, project.Version);
     }

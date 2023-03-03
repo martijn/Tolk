@@ -9,7 +9,6 @@ public class Project : Aggregate
     }
 
     public string? Name { get; private set; }
-    public string? SomeProperty { get; private set; }
 
     public IEnumerable<Phrase> Phrases { get; private set; } = Enumerable.Empty<Phrase>();
 
@@ -19,9 +18,6 @@ public class Project : Aggregate
         {
             case ProjectCreatedEvent projectCreatedEvent:
                 Apply(projectCreatedEvent);
-                break;
-            case SomePropertyChangedEvent somePropertyChangedEvent:
-                Apply(somePropertyChangedEvent);
                 break;
             case PhraseCreatedEvent phraseCreatedEvent:
                 Apply(phraseCreatedEvent);
@@ -41,11 +37,6 @@ public class Project : Aggregate
         return project;
     }
 
-    public void ChangeSomeProperty(string newValue)
-    {
-        ApplyAndStoreEvent(new SomePropertyChangedEvent(new Guid(), newValue));
-    }
-
     public void CreatePhrase(string name)
     {
         ApplyAndStoreEvent(new PhraseCreatedEvent(Guid.NewGuid(), name));
@@ -59,11 +50,6 @@ public class Project : Aggregate
     private void Apply(ProjectCreatedEvent projectCreatedEvent)
     {
         Name = projectCreatedEvent.Name;
-    }
-
-    private void Apply(SomePropertyChangedEvent somePropertyChangedEventEvent)
-    {
-        SomeProperty = somePropertyChangedEventEvent.NewValue;
     }
 
     private void Apply(PhraseCreatedEvent phraseCreatedEvent)
