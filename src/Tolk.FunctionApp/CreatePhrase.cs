@@ -1,5 +1,3 @@
-using System.Collections.Immutable;
-using System.Net;
 using System.Text.Json;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -19,7 +17,7 @@ public class CreatePhrase
     }
 
     [Function("CreatePhrase")]
-    public async Task<MultipleDocumentOutput> Run(
+    public async Task<ProjectEventsOutput> Run(
         [HttpTrigger(AuthorizationLevel.Function, "post")]
         HttpRequestData req,
         Guid projectId,
@@ -32,16 +30,11 @@ public class CreatePhrase
         List<JsonElement> jsonEvents,
         FunctionContext executionContext)
     {
-        if (!jsonEvents.Any()) return MultipleDocumentOutput.NotFound(req);
+        if (!jsonEvents.Any()) return ProjectEventsOutput.NotFound(req);
 
         var project = _projectBuilder.FromJsonEvents(projectId, jsonEvents);
         project.CreatePhrase(name);
 
-        return new MultipleDocumentOutput
-        {
-            // Cast to object to allow polymorphic serialization of derived Events
-            OutputEvents = project.UnsavedEvents().ToImmutableList<object>(),
-            HttpResponse = req.CreateResponse(HttpStatusCode.OK)
-        };
+        return await ProjectEventsOutput.Ok(req, project.UnsavedEvents());
     }
 }
