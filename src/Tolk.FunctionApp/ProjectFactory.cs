@@ -9,7 +9,9 @@ public interface IProjectFactory
 }
 
 /// <summary>
-///     ProjectFactory creates a new Project aggregate from the supplied Domain events.
+///     ProjectFactory builds a new Project aggregate by replaying the supplied Domain events
+///     that were loaded from the database. It should only be used by ProjectBuilder. To create a
+///     new project call <see cref="Tolk.Domain.ProjectAggregate.Project.Create" />.
 /// </summary>
 public class ProjectFactory : IProjectFactory
 {

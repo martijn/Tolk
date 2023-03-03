@@ -24,18 +24,28 @@ public sealed class ProjectBuilder : IProjectBuilder
 
     public Project FromJsonEvents(Guid id, IEnumerable<JsonElement> jsonEvents)
     {
-        var events = new List<IEvent>();
-
-        foreach (var jsonEvent in jsonEvents)
+        var events = jsonEvents.Select(jsonEvent =>
         {
-            var eventTypeString = jsonEvent.GetProperty("Type").GetString();
-            var eventType = Type.GetType($"Tolk.Domain.ProjectAggregate.Events.{eventTypeString}, Tolk.Domain");
+            var eventTypeString = jsonEvent.TryGetProperty("Type", out var typeElement)
+                ? typeElement.GetString()
+                : throw new InvalidEventException("Event does not have a 'Type' attribute");
 
-            if (eventType is null) throw new Exception($"Can't locate eventType {eventTypeString}");
-            // TODO safe cast to IEvent
-            events.Add((IEvent)jsonEvent.Deserialize(eventType)!);
-        }
+            var eventType = Type.GetType($"Tolk.Domain.ProjectAggregate.Events.{eventTypeString}, Tolk.Domain")
+                            ?? throw new InvalidEventException($"Unknown eventType '{eventTypeString}'");
+
+            if (jsonEvent.Deserialize(eventType) is not IEvent deserializedEvent)
+                throw new InvalidEventException($"Could not cast {eventType} to IEvent");
+
+            return deserializedEvent;
+        });
 
         return _projectFactory.Create(id, events);
+    }
+
+    public class InvalidEventException : Exception
+    {
+        public InvalidEventException(string? message) : base(message)
+        {
+        }
     }
 }

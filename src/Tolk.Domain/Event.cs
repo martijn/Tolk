@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Tolk.Domain.ProjectAggregate.Events;
 
 namespace Tolk.Domain;
 
@@ -13,6 +12,7 @@ public class Event : IEvent
 
     [JsonPropertyName("id")]
     public Guid Id { get; }
+
     public string Type { get; }
     public string? Aggregate { get; set; } // todo internal set?
     public int? Version { get; set; } // todo internal set?
