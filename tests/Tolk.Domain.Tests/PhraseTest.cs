@@ -23,7 +23,7 @@ public class PhraseTest
     {
         var initialEvent = new ProjectCreatedEvent(Guid.NewGuid(), "My test project");
         var project = Project.Create(initialEvent);
-        
+
         Assert.Throws<InvariantException>(() => project.UpdateTranslation("key", "en", "value"));
     }
 }

@@ -1,25 +1,23 @@
 using System.Net;
 using System.Text.Json;
 using Tolk.Domain;
-using Tolk.Domain.ProjectAggregate;
 using Tolk.Domain.ProjectAggregate.Events;
-using Tolk.FunctionApp.Tests.Support;
 
 namespace Tolk.FunctionApp.Tests;
 
 public class CreatePhraseTest
 {
     private readonly Mock<IProjectFactory> _mockProjectFactory;
-    private readonly Project _project;
-    private readonly ProjectBuilder _projectBuilder;
-    private readonly CreatePhrase _sut;
+    private readonly CreatePhrase _function;
 
     public CreatePhraseTest()
     {
         _mockProjectFactory = new Mock<IProjectFactory>();
-        _projectBuilder = new ProjectBuilder(_mockProjectFactory.Object);
-        _sut = new CreatePhrase(_projectBuilder);
-        _project = Project.Create(new ProjectCreatedEvent(Guid.Empty, "My Project"));
+        _function = new CreatePhrase(new ProjectBuilder(_mockProjectFactory.Object));
+
+        _mockProjectFactory
+            .Setup(pf => pf.Create(Guid.Empty, It.IsAny<IEnumerable<IEvent>>()))
+            .Returns((Guid id, IEnumerable<IEvent> events) => new ProjectFactory().Create(id, events));
     }
 
     [Fact]
@@ -27,7 +25,7 @@ public class CreatePhraseTest
     {
         var context = new MockFunctionContext();
 
-        var response = await _sut.Run(
+        var response = await _function.Run(
             new MockHttpRequestData(context),
             Guid.Empty,
             "myProject",
@@ -43,39 +41,33 @@ public class CreatePhraseTest
         var context = new MockFunctionContext();
         var jsonEvents = new List<JsonElement> { JsonDocument.Parse(MockEvents.ProjectCreatedEvent).RootElement };
 
-        _mockProjectFactory.Setup(pf => pf.Create(Guid.Empty, It.IsAny<List<IEvent>>())).Returns(_project);
-
-        var response = await _sut.Run(
+        await _function.Run(
             new MockHttpRequestData(context),
             Guid.Empty,
             "myProject",
             jsonEvents,
             context);
 
-        _mockProjectFactory.VerifyAll();
+        _mockProjectFactory.Verify(pf => pf.Create(Guid.Empty, It.IsAny<IEnumerable<IEvent>>()), Times.Once);
     }
 
     [Fact]
-    public async Task AddsPhraseCreatedEvent()
+    public async Task OutputsPhraseCreatedEventAndStatusOk()
     {
         var context = new MockFunctionContext();
         var jsonEvents = new List<JsonElement> { JsonDocument.Parse(MockEvents.ProjectCreatedEvent).RootElement };
 
-        _mockProjectFactory.Setup(pf => pf.Create(Guid.Empty, It.IsAny<List<IEvent>>())).Returns(_project);
-
-        var response = await _sut.Run(
+        var response = await _function.Run(
             new MockHttpRequestData(context),
             Guid.Empty,
             "A new phrase",
             jsonEvents,
             context);
 
-        Assert.IsType<PhraseCreatedEvent>(_project.UnsavedEvents().Last());
-        Assert.Equal("A new phrase", (_project.UnsavedEvents().Last() as PhraseCreatedEvent).Name);
-    }
+        var projectEvent = response.ProjectEvents![0];
+        Assert.IsType<PhraseCreatedEvent>(projectEvent);
+        Assert.Equal("A new phrase", (projectEvent as PhraseCreatedEvent)!.Name);
 
-    [Fact]
-    public async Task ReturnsEventDocumentAndOk()
-    {
+        Assert.Equal(HttpStatusCode.OK, response.HttpResponse!.StatusCode);
     }
 }

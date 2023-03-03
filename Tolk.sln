@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tolk.Domain.Tests", "tests\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tolk.FunctionApp", "src\Tolk.FunctionApp\Tolk.FunctionApp.csproj", "{516EC4EF-C046-4B89-9893-493A7A611FCD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tolk.FunctionApp.Tests", "tests\Tolk.FunctionApp.Tests\Tolk.FunctionApp.Tests.csproj", "{8A7C6D8F-3712-47A4-8466-474E0C5D32AB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{516EC4EF-C046-4B89-9893-493A7A611FCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{516EC4EF-C046-4B89-9893-493A7A611FCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{516EC4EF-C046-4B89-9893-493A7A611FCD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A7C6D8F-3712-47A4-8466-474E0C5D32AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A7C6D8F-3712-47A4-8466-474E0C5D32AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A7C6D8F-3712-47A4-8466-474E0C5D32AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A7C6D8F-3712-47A4-8466-474E0C5D32AB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
