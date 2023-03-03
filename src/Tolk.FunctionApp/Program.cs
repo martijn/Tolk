@@ -4,8 +4,9 @@ using Tolk.FunctionApp;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults()
-    .ConfigureServices(s =>
-        s.AddSingleton<IProjectBuilder, ProjectBuilder>())
+    .ConfigureServices(s => s
+        .AddSingleton<IProjectFactory, ProjectFactory>()
+        .AddSingleton<IProjectBuilder, ProjectBuilder>())
     .Build();
 
 host.Run();

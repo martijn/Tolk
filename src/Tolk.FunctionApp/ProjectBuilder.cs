@@ -4,8 +4,24 @@ using Tolk.Domain.ProjectAggregate;
 
 namespace Tolk.FunctionApp;
 
-internal sealed class ProjectBuilder : IProjectBuilder
+public interface IProjectBuilder
 {
+    Project FromJsonEvents(Guid id, IEnumerable<JsonElement> jsonEvents);
+}
+
+/// <summary>
+///     ProjectBuilder rehydrates a Project aggregate from a list of events received from CosmosDB, in the
+///     original JSON format.
+/// </summary>
+public sealed class ProjectBuilder : IProjectBuilder
+{
+    private readonly IProjectFactory _projectFactory;
+
+    public ProjectBuilder(IProjectFactory projectFactory)
+    {
+        _projectFactory = projectFactory;
+    }
+
     public Project FromJsonEvents(Guid id, IEnumerable<JsonElement> jsonEvents)
     {
         var events = new List<IEvent>();
@@ -20,6 +36,6 @@ internal sealed class ProjectBuilder : IProjectBuilder
             events.Add((IEvent)jsonEvent.Deserialize(eventType)!);
         }
 
-        return new Project(id, events);
+        return _projectFactory.Create(id, events);
     }
 }

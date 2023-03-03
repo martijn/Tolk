@@ -19,7 +19,7 @@ public class CreatePhrase
     }
 
     [Function("CreatePhrase")]
-    public async Task<SingleDocumentOutput> Run(
+    public async Task<MultipleDocumentOutput> Run(
         [HttpTrigger(AuthorizationLevel.Function, "post")]
         HttpRequestData req,
         Guid projectId,
@@ -32,32 +32,16 @@ public class CreatePhrase
         List<JsonElement> jsonEvents,
         FunctionContext executionContext)
     {
-        if (!jsonEvents.Any())
-            return new SingleDocumentOutput
-            {
-                HttpResponse = req.CreateResponse(HttpStatusCode.NotFound)
-            };
+        if (!jsonEvents.Any()) return MultipleDocumentOutput.NotFound(req);
 
         var project = _projectBuilder.FromJsonEvents(projectId, jsonEvents);
         project.CreatePhrase(name);
 
-        return new SingleDocumentOutput
+        return new MultipleDocumentOutput
         {
             // Cast to object to allow polymorphic serialization of derived Events
             OutputEvents = project.UnsavedEvents().ToImmutableList<object>(),
             HttpResponse = req.CreateResponse(HttpStatusCode.OK)
         };
-    }
-
-    public class SingleDocumentOutput
-    {
-        [CosmosDBOutput(
-            "TolkDev",
-            "ProjectEvents",
-            Connection = "AzureCosmosDbConnectionString")]
-
-        public IReadOnlyList<object>? OutputEvents { get; set; }
-
-        public HttpResponseData? HttpResponse { get; set; }
     }
 }
