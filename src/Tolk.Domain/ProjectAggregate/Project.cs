@@ -67,11 +67,15 @@ public class Project : Aggregate
 
     private void Apply(PhraseCreatedEvent phraseCreatedEvent)
     {
+        if (Archived) throw new InvariantException("Cannot modify an archived project");
+        
         Phrases = Phrases.Union(new List<Phrase> { Phrase.Create(phraseCreatedEvent.Name) });
     }
 
     private void Apply(TranslationUpdatedEvent @event)
     {
+        if (Archived) throw new InvariantException("Cannot modify an archived project");
+        
         var oldPhrase = Phrases.FirstOrDefault(p => p.Key == @event.PhraseKey);
         if (oldPhrase is null)
             throw new InvariantException("Phrase not found");

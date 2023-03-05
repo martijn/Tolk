@@ -1,21 +1,35 @@
-POST http://localhost:7071/api/CreatePhrase
-Content-Type: application/json
-
-{
-  "projectId": "19d0db40-a7e1-45ff-90e5-dbb18e9613ce",
-  "name": "New Phrase 2"
-}
-
-###
 GET http://localhost:7071/api/GetProject/19d0db40-a7e1-45ff-90e5-dbb18e9613ce
-Accept: application/json
 
 ###
+
 POST http://localhost:7071/api/CreateProject
 Accept: application/json
 
 {
   "name": "My dope project"
+}
+
+###
+
+POST http://localhost:7071/api/CreatePhrase
+Content-Type: application/json
+
+{
+  "projectId": "19d0db40-a7e1-45ff-90e5-dbb18e9613ce",
+  "name": "I should have two of these as well 3"
+}
+
+###
+
+POST http://localhost:7071/api/UpdateTranslation
+Accept: application/json
+
+{
+  "projectId": "19d0db40-a7e1-45ff-90e5-dbb18e9613ce",
+  "phraseKey": "I should have two of these as well 3",
+  "locale": "nl",
+  "value": "Ik zou hier drie van moeten hebben"
+  
 }
 
 ###
