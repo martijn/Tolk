@@ -8,14 +8,17 @@ public class Project : Aggregate
     {
     }
 
+    public bool Archived { get; private set; }
     public string? Name { get; private set; }
-
     public IEnumerable<Phrase> Phrases { get; private set; } = Enumerable.Empty<Phrase>();
 
     protected override void ApplyEvent(IEvent @event)
     {
         switch (@event)
         {
+            case ProjectArchivedEvent projectArchivedEvent:
+                Apply(projectArchivedEvent);
+                break;
             case ProjectCreatedEvent projectCreatedEvent:
                 Apply(projectCreatedEvent);
                 break;
@@ -37,6 +40,11 @@ public class Project : Aggregate
         return project;
     }
 
+    public void Archive()
+    {
+        ApplyAndStoreEvent(new ProjectArchivedEvent(Guid.NewGuid()));
+    }
+        
     public void CreatePhrase(string name)
     {
         ApplyAndStoreEvent(new PhraseCreatedEvent(Guid.NewGuid(), name));
@@ -47,6 +55,11 @@ public class Project : Aggregate
         ApplyAndStoreEvent(new TranslationUpdatedEvent(Guid.NewGuid(), phraseKey, locale, value));
     }
 
+    private void Apply(ProjectArchivedEvent projectArchivedEvent)
+    {
+        Archived = true;
+    }
+    
     private void Apply(ProjectCreatedEvent projectCreatedEvent)
     {
         Name = projectCreatedEvent.Name;

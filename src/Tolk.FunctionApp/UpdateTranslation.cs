@@ -4,24 +4,26 @@ using Microsoft.Azure.Functions.Worker.Http;
 
 namespace Tolk.FunctionApp;
 
-public class CreatePhrase
+public class UpdateTranslation
 {
     private const string Query =
         "SELECT * FROM ProjectEvents e WHERE e.Aggregate = CONCAT('Project-', {projectId}) ORDER BY e.Version ASC";
-
+    
     private readonly IProjectBuilder _projectBuilder;
 
-    public CreatePhrase(IProjectBuilder projectBuilder)
+    public UpdateTranslation(IProjectBuilder projectBuilder)
     {
         _projectBuilder = projectBuilder;
     }
 
-    [Function("CreatePhrase")]
+    [Function("UpdateTranslation")]
     public async Task<ProjectEventsOutput> Run(
         [HttpTrigger(AuthorizationLevel.Function, "post")]
         HttpRequestData req,
         Guid projectId,
-        string name,
+        string phraseKey,
+        string locale,
+        string value,
         [CosmosDBInput(
             "TolkDev",
             "ProjectEvents",
@@ -33,8 +35,9 @@ public class CreatePhrase
         if (!jsonEvents.Any()) return ProjectEventsOutput.NotFound(req);
 
         var project = _projectBuilder.FromJsonEvents(projectId, jsonEvents);
-        project.CreatePhrase(name);
+        project.UpdateTranslation(phraseKey, locale, value);
 
         return await ProjectEventsOutput.Ok(req, project.UnsavedEvents());
     }
+    
 }
